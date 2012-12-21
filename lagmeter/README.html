@@ -1,0 +1,29 @@
+<pre>
+lagmeter  - small utility for scheduling lag measurement
+
+	More or less POSIX portable, but tested only under Linux.
+
+	Copyright terms: GNU GPL v3 or newer.
+
+	It does a microsecond sleeping loop on every cpu. When you hit
+	Ctrl-c then it will terminate and print out the lag max/min/avg.
+
+	Compile it with:
+
+		gcc -O3 -lpthread -o lagmeter lagmeter.c
+
+	Usage:
+		best case lag:
+									    		
+			lagmeter
+			.
+			.
+			Ctrl-c
+
+		worst case lag:
+
+			lagmeter -a
+			.
+			.
+			Ctrl-c
+</pre>
