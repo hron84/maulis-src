@@ -1,0 +1,51 @@
+#! /bin/sh
+# - maulis - hack only okay?!
+
+NAME=natbox
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+INTIF="eth1"
+EXTIF="eth0"
+EXTIP="`/sbin/ifconfig ${EXTIF} | awk -F "( *|:)" '/inet addr/{print $4}'`"
+
+set -e
+
+startit(){
+	/sbin/modprobe ip_tables ip_conntrack iptable_nat 
+	iptables -P FORWARD DROP
+	iptables -F FORWARD 
+	iptables -t nat -F
+	iptables -A FORWARD -i $EXTIF -o $INTIF -m state --state ESTABLISHED,RELATED -j ACCEPT
+	iptables -A FORWARD -i $INTIF -o $EXTIF -j ACCEPT
+	iptables -t nat -A POSTROUTING -o $EXTIF -j MASQUERADE
+
+	echo "1" > /proc/sys/net/ipv4/ip_forward
+}
+
+stopit(){
+	echo "0" > /proc/sys/net/ipv4/ip_forward
+	iptables -P FORWARD DROP
+	iptables -F FORWARD
+	iptables -t nat -F
+	/sbin/modprobe -r ip_conntrack iptable_nat
+}
+
+case "$1" in
+  start)
+  	startit
+	;;
+  stop)
+  	stopit
+	;;
+
+  restart|force-reload)
+  	stopit;
+	startit;
+	;;
+  *)
+	N=/etc/init.d/$NAME
+	echo "Usage: $N {start|stop|restart|force-reload}" >&2
+	exit 1
+	;;
+esac
+
+exit 0
