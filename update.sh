@@ -11,3 +11,6 @@ cp -r maulis.web.elte.hu/src/* .
 rm -fr maulis.web.elte.hu
 git add . 
 git commit -m "Autoupdate ${DATE}"
+if [ -d git/refs/remotes/origin ]; then
+  git push origin ftp
+fi
